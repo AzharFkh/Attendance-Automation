@@ -1,0 +1,16 @@
+[Unit]
+Description=Automasi Presensi MagangHub Kemnaker (Senin-Jumat 15:00 WIB)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=azhar-fakhri
+WorkingDirectory=/home/azhar-fakhri/Documents/python/automasi_presensi_maganghub
+ExecStart=/home/azhar-fakhri/Documents/python/automasi_presensi_maganghub/.venv/bin/python scheduler.py
+Restart=on-failure
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

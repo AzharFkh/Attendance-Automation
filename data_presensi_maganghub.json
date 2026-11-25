@@ -1,0 +1,52 @@
+{
+  "Jumat, 27 November 2026": {
+    "uraian aktivitas": "Melakukan pengembangan lanjutan pada endpoint REST API fitur alur kas (cash flow) backend, meliputi penambahan filter rentang tanggal, validasi input request, serta penyesuaian struktur query pada layer repository agar mendukung kebutuhan laporan transaksi.",
+    "pembelajaran yang diperoleh": "Memahami teknik optimasi query filter tanggal pada database relasional serta penerapan validasi request yang ketat di sisi backend guna mencegah data transaksi yang tidak valid masuk ke dalam sistem.",
+    "kendala yang dialami": "Perlu melakukan penyesuaian pada beberapa kondisi edge-case terkait zona waktu (timezone) saat memfilter transaksi harian dan bulanan, namun setelah dilakukan pengujian ulang endpoint sudah berjalan sesuai ekspektasi."
+  },
+  "Senin, 30 November 2026": {
+    "uraian aktivitas": "Melakukan integrasi komunikasi antar-service menggunakan gRPC dan Protobuf pada layanan manajemen transaksi serta melakukan sinkronisasi data pengguna dari service autentikasi untuk mendukung pencatatan riwayat aktivitas alur kas.",
+    "pembelajaran yang diperoleh": "Memperoleh pemahaman mendalam mengenai mekanisme pertukaran data antar-microservice menggunakan gRPC serta cara mengelola kontrak file Protobuf agar komunikasi antar-layanan tetap cepat dan type-safe.",
+    "kendala yang dialami": "Sempat mengalami ketidaksesuaian versi file generate Protobuf antara dua service yang berbeda, namun kendala berhasil diatasi setelah melakukan regenerasi file proto dan menyelaraskan struktur dependensi."
+  },
+  "Selasa, 1 Desember 2026": {
+    "uraian aktivitas": "Mengimplementasikan caching menggunakan Redis pada beberapa endpoint pembacaan data (GET) yang sering diakses untuk meningkatkan performa waktu respons API serta mengurangi beban query langsung ke database utama.",
+    "pembelajaran yang diperoleh": "Memahami strategi caching pada backend menggunakan Redis, termasuk pengaturan Time-To-Live (TTL) dan mekanisme cache invalidation saat terjadi perubahan atau penambahan data baru pada database.",
+    "kendala yang dialami": "Diperlukan ketelitian ekstra dalam menentukan momen yang tepat untuk melakukan penghapusan cache (invalidation) agar data yang ditampilkan ke pengguna tetap konsisten dan tidak mengalami stale data."
+  },
+  "Rabu, 2 Desember 2026": {
+    "uraian aktivitas": "Melakukan penulisan unit test pada layer service dan repository menggunakan bahasa Golang untuk memastikan setiap logika bisnis pada fitur alur kas serta penanganan error telah teruji pada berbagai skenario input.",
+    "pembelajaran yang diperoleh": "Memahami praktik pengujian perangkat lunak di sisi backend melalui pembuatan unit test dan mocking dependensi repository, sehingga kualitas kode lebih terjamin sebelum masuk ke tahap integrasi.",
+    "kendala yang dialami": "Membutuhkan waktu tambahan untuk menyusun mock interface pada beberapa dependensi database dan service eksternal agar skenario pengujian error dapat disimulasikan secara akurat."
+  },
+  "Kamis, 3 Desember 2026": {
+    "uraian aktivitas": "Melakukan pembaruan dokumentasi API menggunakan Swagger/OpenAPI untuk seluruh endpoint baru dan endpoint yang mengalami perubahan struktur JSON, serta melakukan pengujian end-to-end bersama tim frontend.",
+    "pembelajaran yang diperoleh": "Memahami pentingnya dokumentasi API yang akurat dan selalu terbarui sebagai jembatan komunikasi teknis antara tim backend dan frontend selama proses integrasi fitur berlangsung.",
+    "kendala yang dialami": "Terdapat beberapa perbedaan penamaan field pada dokumentasi lama dengan struktur response terbaru, sehingga perlu dilakukan penyesuaian anotasi Swagger dan pengujian ulang di lingkungan staging."
+  },
+  "Jumat, 4 Desember 2026": {
+    "uraian aktivitas": "Melakukan implementasi pemrosesan tugas asinkron (asynchronous processing) menggunakan message broker RabbitMQ untuk menangani pengiriman notifikasi dan pencatatan log aktivitas transaksi tanpa menghambat respons utama API.",
+    "pembelajaran yang diperoleh": "Memahami konsep event-driven dan pemrosesan latar belakang (background worker) menggunakan RabbitMQ untuk menjaga latensi endpoint tetap rendah meskipun terdapat proses lanjutan yang cukup berat.",
+    "kendala yang dialami": "Perlu memastikan mekanisme acknowledgment dan retry pada worker berjalan dengan baik agar pesan tidak hilang apabila terjadi gangguan koneksi sementara pada layanan penerima."
+  },
+  "Senin, 7 Desember 2026": {
+    "uraian aktivitas": "Melakukan perbaikan bug (bug fixing) dan refactoring pada beberapa fungsi di layer service untuk mengurangi duplikasi kode, memperbaiki penanganan error HTTP status code, serta meningkatkan keterbacaan kode.",
+    "pembelajaran yang diperoleh": "Memperoleh pengalaman dalam menjaga kebersihan dan keterbacaan codebase (clean code) serta memastikan setiap respons error memiliki kode status HTTP dan pesan yang informatif bagi sisi klien.",
+    "kendala yang dialami": "Harus memastikan proses refactoring tidak mengubah kontrak perilaku endpoint yang sudah terintegrasi dengan frontend, sehingga diperlukan pengecekan menyeluruh pada seluruh alur pengujian."
+  },
+  "Selasa, 8 Desember 2026": {
+    "uraian aktivitas": "Melakukan pengecekan dan penyesuaian hak akses berbasis peran (Role-Based Access Control / RBAC) pada endpoint sensitif untuk memastikan setiap pengguna hanya dapat mengakses dan memodifikasi data sesuai dengan perannya.",
+    "pembelajaran yang diperoleh": "Memahami penerapan keamanan API melalui middleware autentikasi dan otorisasi berbasis role serta isolasi data antar-tenant pada arsitektur backend multi-tenant.",
+    "kendala yang dialami": "Sempat ditemukan celah validasi akses pada salah satu endpoint detail transaksi, namun langsung berhasil diperbaiki dengan menambahkan pengecekan kepemilikan data pada layer service."
+  },
+  "Rabu, 9 Desember 2026": {
+    "uraian aktivitas": "Melakukan konfigurasi containerization menggunakan Docker dan Docker Compose untuk layanan backend yang baru diperbarui serta melakukan pengujian build image multi-stage di lingkungan pengembangan lokal.",
+    "pembelajaran yang diperoleh": "Memahami cara mengemas aplikasi backend Golang ke dalam container Docker yang ringan dan terisolasi sehingga lingkungan pengembangan maupun deployment menjadi lebih konsisten.",
+    "kendala yang dialami": "Sempat terjadi kendala konfigurasi environment variable antar-container pada jaringan Docker internal, namun berhasil diselesaikan dengan menyelaraskan file konfigurasi Docker Compose."
+  },
+  "Kamis, 10 Desember 2026": {
+    "uraian aktivitas": "Melakukan review kode (code review) bersama tim backend, menyelesaikan catatan revisi pada merge request, serta melakukan pengujian integrasi menyeluruh pada seluruh fitur yang dikerjakan selama dua pekan terakhir.",
+    "pembelajaran yang diperoleh": "Memperoleh banyak masukan konstruktif terkait standar penulisan kode Golang, efisiensi query, dan struktur arsitektur microservice melalui proses code review bersama tim pengembang.",
+    "kendala yang dialami": "Terdapat beberapa konflik penggabungan kode (merge conflict) akibat pembaruan paralel dari anggota tim lain pada repositori Git, namun berhasil diselesaikan dengan rapi setelah sinkronisasi branch."
+  }
+}
