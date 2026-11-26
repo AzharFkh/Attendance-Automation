@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import random
 import re
 import shutil
@@ -43,9 +44,28 @@ def _detect_chrome_major_version() -> int | None:
     return None
 
 
+def _cleanup_stale_profile_locks(profile_dir: Path) -> None:
+    """Remove stale Chromium singleton lock files that can block startup in Docker."""
+    for lock_name in ("SingletonLock", "SingletonSocket", "SingletonCookie"):
+        lock_path = profile_dir / lock_name
+        if lock_path.exists() or lock_path.is_symlink():
+            try:
+                lock_path.unlink()
+            except OSError:
+                pass
+
+
 def create_stealth_driver(config: AppConfig) -> WebDriver:
     """Create an undetected-chromedriver instance with persistent profile and stealth options."""
     config.chrome_profile_dir.mkdir(parents=True, exist_ok=True)
+    _cleanup_stale_profile_locks(config.chrome_profile_dir)
+
+    headless = config.headless
+    if not headless and os.name != "nt" and not os.environ.get("DISPLAY"):
+        logger.warning(
+            "DISPLAY tidak ditemukan pada environment; otomatis beralih ke mode headless=True."
+        )
+        headless = True
 
     options = uc.ChromeOptions()
     options.add_argument(f"--user-data-dir={config.chrome_profile_dir}")
@@ -56,7 +76,7 @@ def create_stealth_driver(config: AppConfig) -> WebDriver:
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-blink-features=AutomationControlled")
 
-    if config.headless:
+    if headless:
         options.add_argument("--headless=new")
 
     version_main = config.chrome_version_main or _detect_chrome_major_version()
@@ -69,7 +89,7 @@ def create_stealth_driver(config: AppConfig) -> WebDriver:
 
     logger.info(
         "Memulai stealth Chrome (headless=%s, version_main=%s, profile=%s)",
-        config.headless,
+        headless,
         version_main,
         config.chrome_profile_dir,
     )
