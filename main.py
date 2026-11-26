@@ -34,6 +34,17 @@ def parse_args() -> argparse.Namespace:
         help="Isi form & simpan screenshot tanpa menekan tombol submit.",
     )
     parser.add_argument(
+        "--headed",
+        action="store_true",
+        help="Tampilkan jendela browser Chrome (HEADLESS=false) untuk pemantauan.",
+    )
+    parser.add_argument(
+        "--step-delay",
+        type=float,
+        default=None,
+        help="Jeda antar tahap dalam detik (contoh: 3 atau 5) untuk inspeksi manual.",
+    )
+    parser.add_argument(
         "--force-weekend",
         action="store_true",
         help="Tetap jalankan meskipun tanggal target adalah Sabtu/Minggu.",
@@ -43,7 +54,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    config = AppConfig.from_env(dry_run_override=True if args.dry_run else None)
+    config = AppConfig.from_env(
+        dry_run_override=True if args.dry_run else None,
+        headless_override=False if args.headed else None,
+        step_delay_override=args.step_delay,
+    )
     setup_logging(config.logs_dir)
 
     if not args.run_now:

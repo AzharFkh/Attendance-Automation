@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import logging
 import random
+import re
+import shutil
+import subprocess
 import time
 from pathlib import Path
 
@@ -24,6 +27,22 @@ def human_delay(min_sec: float = 0.6, max_sec: float = 1.6) -> None:
     time.sleep(random.uniform(min_sec, max_sec))
 
 
+def _detect_chrome_major_version() -> int | None:
+    """Detect installed Chrome/Chromium major version to match ChromeDriver."""
+    for binary in ("google-chrome", "chromium", "chromium-browser"):
+        path = shutil.which(binary)
+        if not path:
+            continue
+        try:
+            output = subprocess.check_output([path, "--version"], text=True, timeout=5)
+            match = re.search(r"(\d+)\.\d+\.\d+", output)
+            if match:
+                return int(match.group(1))
+        except Exception:
+            continue
+    return None
+
+
 def create_stealth_driver(config: AppConfig) -> WebDriver:
     """Create an undetected-chromedriver instance with persistent profile and stealth options."""
     config.chrome_profile_dir.mkdir(parents=True, exist_ok=True)
@@ -40,16 +59,18 @@ def create_stealth_driver(config: AppConfig) -> WebDriver:
     if config.headless:
         options.add_argument("--headless=new")
 
+    version_main = config.chrome_version_main or _detect_chrome_major_version()
     kwargs: dict = {
         "options": options,
         "use_subprocess": True,
     }
-    if config.chrome_version_main is not None:
-        kwargs["version_main"] = config.chrome_version_main
+    if version_main is not None:
+        kwargs["version_main"] = version_main
 
     logger.info(
-        "Memulai stealth Chrome (headless=%s, profile=%s)",
+        "Memulai stealth Chrome (headless=%s, version_main=%s, profile=%s)",
         config.headless,
+        version_main,
         config.chrome_profile_dir,
     )
     driver = uc.Chrome(**kwargs)

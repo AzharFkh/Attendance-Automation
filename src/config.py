@@ -31,13 +31,20 @@ class AppConfig:
     screenshots_dir: Path
     headless: bool
     dry_run: bool
+    step_delay_sec: float
     chrome_version_main: int | None
     timezone: str
     schedule_hour: int
     schedule_minute: int
 
     @classmethod
-    def from_env(cls, env_path: Path | None = None, dry_run_override: bool | None = None) -> "AppConfig":
+    def from_env(
+        cls,
+        env_path: Path | None = None,
+        dry_run_override: bool | None = None,
+        headless_override: bool | None = None,
+        step_delay_override: float | None = None,
+    ) -> "AppConfig":
         project_root = Path(__file__).resolve().parent.parent
         load_dotenv(dotenv_path=env_path or (project_root / ".env"))
 
@@ -49,6 +56,14 @@ class AppConfig:
         dry_run = _parse_bool(os.getenv("DRY_RUN"), default=True)
         if dry_run_override is not None:
             dry_run = dry_run_override
+
+        headless = _parse_bool(os.getenv("HEADLESS"), default=False)
+        if headless_override is not None:
+            headless = headless_override
+
+        step_delay_sec = float(os.getenv("STEP_DELAY_SEC", "3"))
+        if step_delay_override is not None:
+            step_delay_sec = step_delay_override
 
         return cls(
             kemnaker_email=os.getenv("KEMNAKER_EMAIL", "").strip(),
@@ -62,8 +77,9 @@ class AppConfig:
             else Path(profile_raw),
             logs_dir=logs_dir,
             screenshots_dir=screenshots_dir,
-            headless=_parse_bool(os.getenv("HEADLESS"), default=True),
+            headless=headless,
             dry_run=dry_run,
+            step_delay_sec=step_delay_sec,
             chrome_version_main=_parse_optional_int(os.getenv("CHROME_VERSION_MAIN")),
             timezone=os.getenv("TIMEZONE", "Asia/Jakarta").strip(),
             schedule_hour=int(os.getenv("SCHEDULE_HOUR", "15")),

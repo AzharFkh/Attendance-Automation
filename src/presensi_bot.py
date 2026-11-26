@@ -26,6 +26,14 @@ class AttendanceBotError(RuntimeError):
     """Raised when attendance automation encounters an unrecoverable state."""
 
 
+def _step_pause(stage: str, delay_sec: float) -> None:
+    """Log the current stage clearly and pause so the user can inspect it manually."""
+    logger.info("[TAHAP] %s", stage)
+    if delay_sec > 0:
+        logger.info("Menunggu %.1f detik sebelum tahap berikutnya...", delay_sec)
+        time.sleep(delay_sec)
+
+
 def _is_login_page(driver: WebDriver) -> bool:
     url = driver.current_url.lower()
     if "login" in url or "account.kemnaker" in url or "auth" in url:
@@ -36,7 +44,7 @@ def _is_login_page(driver: WebDriver) -> bool:
 
 def _perform_login(driver: WebDriver, config: AppConfig) -> None:
     config.validate_credentials()
-    logger.info("Halaman login terdeteksi (%s). Mencoba login...", driver.current_url)
+    _step_pause(f"Login ke akun Kemnaker ({driver.current_url})", config.step_delay_sec)
 
     email_el = find_first_visible(driver, selectors.LOGIN_EMAIL_LOCATORS, timeout=15)
     password_el = find_first_visible(driver, selectors.LOGIN_PASSWORD_LOCATORS, timeout=10)
@@ -44,9 +52,9 @@ def _perform_login(driver: WebDriver, config: AppConfig) -> None:
         raise AttendanceBotError("Field email/password pada halaman login tidak ditemukan.")
 
     human_type(driver, email_el, config.kemnaker_email)
-    human_delay(0.4, 0.9)
+    _step_pause("Email/Username login sudah diisi", config.step_delay_sec)
     human_type(driver, password_el, config.kemnaker_password)
-    human_delay(0.5, 1.1)
+    _step_pause("Password login sudah diisi", config.step_delay_sec)
 
     submit_el = find_first_visible(driver, selectors.LOGIN_SUBMIT_LOCATORS, timeout=5)
     if not submit_el:
@@ -58,8 +66,7 @@ def _perform_login(driver: WebDriver, config: AppConfig) -> None:
     deadline = time.monotonic() + 30
     while time.monotonic() < deadline:
         if "monev.maganghub.kemnaker.go.id" in driver.current_url and not _is_login_page(driver):
-            logger.info("Login berhasil. URL saat ini: %s", driver.current_url)
-            human_delay(1.5, 2.5)
+            _step_pause(f"Login berhasil ({driver.current_url})", config.step_delay_sec)
             return
         time.sleep(0.5)
 
@@ -102,9 +109,9 @@ def _select_kehadiran_hadir(driver: WebDriver) -> None:
     logger.info("Custom dropdown Kehadiran dipilih: Hadir")
 
 
-def _fill_attendance_form(driver: WebDriver, entry: AttendanceEntry) -> None:
+def _fill_attendance_form(driver: WebDriver, entry: AttendanceEntry, step_delay_sec: float) -> None:
     _select_kehadiran_hadir(driver)
-    human_delay(0.5, 1.0)
+    _step_pause("Dropdown Kehadiran 'Hadir' sudah dipilih", step_delay_sec)
 
     fields = [
         ("Uraian Aktivitas", selectors.URAIAN_TEXTAREA_LOCATORS, entry.uraian_aktivitas),
@@ -121,8 +128,7 @@ def _fill_attendance_form(driver: WebDriver, entry: AttendanceEntry) -> None:
         if textarea is None:
             raise AttendanceBotError(f"Textarea '{label}' tidak ditemukan.")
         human_type(driver, textarea, value)
-        logger.info("Field '%s' berhasil diisi (%d karakter).", label, len(value))
-        human_delay(0.5, 1.2)
+        _step_pause(f"Field '{label}' sudah diisi ({len(value)} karakter)", step_delay_sec)
 
 
 def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
@@ -143,14 +149,15 @@ def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
 
     try:
         driver = create_stealth_driver(config)
-        logger.info("Membuka halaman presensi: %s", target_url)
+        _step_pause(f"Browser siap, membuka halaman: {target_url}", config.step_delay_sec)
         driver.get(target_url)
-        human_delay(2.5, 4.0)
+        human_delay(2.0, 3.0)
 
         if _is_login_page(driver):
             _perform_login(driver, config)
+            _step_pause(f"Kembali ke halaman target: {target_url}", config.step_delay_sec)
             driver.get(target_url)
-            human_delay(2.5, 4.0)
+            human_delay(2.0, 3.0)
 
         # Pastikan form atau status sudah ter-render
         find_first_visible(
@@ -161,19 +168,20 @@ def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
 
         existing_status = _detect_existing_status(driver)
         if existing_status:
-            logger.info(
-                "Presensi %s sudah berstatus '%s'. Tidak perlu diisi ulang.",
-                entry.date_label,
-                existing_status,
+            _step_pause(
+                f"Presensi {entry.date_label} sudah berstatus '{existing_status}'. Tidak perlu diisi ulang.",
+                config.step_delay_sec,
             )
             save_screenshot(driver, config.screenshots_dir, f"already_{entry.date_iso}_{timestamp}")
             return True
 
-        _fill_attendance_form(driver, entry)
-        human_delay(0.8, 1.5)
+        _fill_attendance_form(driver, entry, config.step_delay_sec)
 
         if config.dry_run:
-            logger.info("DRY_RUN aktif: form sudah diisi untuk %s, submit dilewati.", entry.date_label)
+            _step_pause(
+                f"DRY_RUN aktif: seluruh form untuk {entry.date_label} sudah diisi (tanpa submit)",
+                config.step_delay_sec,
+            )
             save_screenshot(driver, config.screenshots_dir, f"dryrun_{entry.date_iso}_{timestamp}")
             return True
 
@@ -182,19 +190,19 @@ def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
             raise AttendanceBotError("Tombol submit form presensi tidak ditemukan.")
 
         safe_click(driver, submit_btn)
-        human_delay(0.8, 1.5)
+        _step_pause("Tombol Submit diklik, mengecek dialog konfirmasi...", config.step_delay_sec)
 
         confirm_btn = find_first_visible(driver, selectors.CONFIRM_MODAL_LOCATORS, timeout=3)
         if confirm_btn is not None:
             safe_click(driver, confirm_btn)
+            _step_pause("Dialog konfirmasi diklik", config.step_delay_sec)
 
-        human_delay(2.5, 4.0)
+        human_delay(2.0, 3.0)
         final_status = _detect_existing_status(driver)
         save_screenshot(driver, config.screenshots_dir, f"submitted_{entry.date_iso}_{timestamp}")
-        logger.info(
-            "Presensi %s selesai dikirim. Status halaman: %s",
-            entry.date_label,
-            final_status or "Periksa screenshot",
+        _step_pause(
+            f"Presensi {entry.date_label} selesai dikirim. Status halaman: {final_status or 'Periksa screenshot'}",
+            config.step_delay_sec,
         )
         return True
     except Exception:
