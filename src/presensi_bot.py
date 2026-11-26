@@ -77,7 +77,14 @@ def _perform_login(driver: WebDriver, config: AppConfig) -> None:
 
 
 def _detect_existing_status(driver: WebDriver) -> str | None:
+    # Jika form input (textarea) tampil, berarti presensi hari ini BELUM diisi.
+    if find_first_visible(driver, selectors.URAIAN_TEXTAREA_LOCATORS, timeout=1.0) is not None:
+        return None
+
     body_text = driver.execute_script("return document.body ? document.body.innerText : '';") or ""
+    if "Tambah laporan" in body_text:
+        return None
+
     for status in selectors.ALREADY_FILLED_TEXTS:
         if status in body_text:
             return status
@@ -85,7 +92,7 @@ def _detect_existing_status(driver: WebDriver) -> str | None:
 
 
 def _select_kehadiran_hadir(driver: WebDriver) -> None:
-    select_el = find_first_visible(driver, selectors.KEHADIRAN_SELECT_LOCATORS, timeout=4)
+    select_el = find_first_visible(driver, selectors.KEHADIRAN_SELECT_LOCATORS, timeout=2)
     if select_el is not None:
         select = Select(select_el)
         for option in select.options:
@@ -98,6 +105,10 @@ def _select_kehadiran_hadir(driver: WebDriver) -> None:
     if dropdown_btn is None:
         raise AttendanceBotError("Dropdown 'Kehadiran' tidak ditemukan pada halaman.")
 
+    if "hadir" in (dropdown_btn.text or "").strip().lower():
+        logger.info("Dropdown Kehadiran sudah terpilih: Hadir")
+        return
+
     safe_click(driver, dropdown_btn)
     human_delay(0.4, 0.8)
 
@@ -109,18 +120,34 @@ def _select_kehadiran_hadir(driver: WebDriver) -> None:
     logger.info("Custom dropdown Kehadiran dipilih: Hadir")
 
 
+def _check_declaration_checkbox(driver: WebDriver, step_delay_sec: float) -> None:
+    checkbox_inputs = driver.find_elements(
+        *selectors.DECLARATION_CHECKBOX_LOCATORS[2]
+    ) or driver.find_elements(*selectors.DECLARATION_CHECKBOX_LOCATORS[4])
+    if checkbox_inputs and checkbox_inputs[0].is_selected():
+        _step_pause("Checkbox pernyataan sudah dicentang", step_delay_sec)
+        return
+
+    clickable_target = find_first_visible(driver, selectors.DECLARATION_CHECKBOX_LOCATORS, timeout=6)
+    if clickable_target is None:
+        raise AttendanceBotError("Checkbox pernyataan 'Saya menyatakan telah meninjau...' tidak ditemukan.")
+
+    safe_click(driver, clickable_target)
+    _step_pause("Checkbox pernyataan sudah dicentang", step_delay_sec)
+
+
 def _fill_attendance_form(driver: WebDriver, entry: AttendanceEntry, step_delay_sec: float) -> None:
     _select_kehadiran_hadir(driver)
     _step_pause("Dropdown Kehadiran 'Hadir' sudah dipilih", step_delay_sec)
 
     fields = [
-        ("Uraian Aktivitas", selectors.URAIAN_TEXTAREA_LOCATORS, entry.uraian_aktivitas),
+        ("Uraian aktivitas", selectors.URAIAN_TEXTAREA_LOCATORS, entry.uraian_aktivitas),
         (
-            "Pembelajaran yang Diperoleh",
+            "Pembelajaran yang diperoleh",
             selectors.PEMBELAJARAN_TEXTAREA_LOCATORS,
             entry.pembelajaran_diperoleh,
         ),
-        ("Kendala yang Dialami", selectors.KENDALA_TEXTAREA_LOCATORS, entry.kendala_dialami),
+        ("Kendala yang dialami", selectors.KENDALA_TEXTAREA_LOCATORS, entry.kendala_dialami),
     ]
 
     for label, locators, value in fields:
@@ -129,6 +156,8 @@ def _fill_attendance_form(driver: WebDriver, entry: AttendanceEntry, step_delay_
             raise AttendanceBotError(f"Textarea '{label}' tidak ditemukan.")
         human_type(driver, textarea, value)
         _step_pause(f"Field '{label}' sudah diisi ({len(value)} karakter)", step_delay_sec)
+
+    _check_declaration_checkbox(driver, step_delay_sec)
 
 
 def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:

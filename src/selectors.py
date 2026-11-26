@@ -29,55 +29,64 @@ LOGIN_SUBMIT_LOCATORS: tuple[Locator, ...] = (
 # --- Status Badges / Indicators ---
 ALREADY_FILLED_TEXTS: tuple[str, ...] = (
     "Menunggu Persetujuan",
-    "Menunggu Tindakan Mentor",
     "Hadir disetujui",
     "Izin disetujui",
-    "Hari Libur",
 )
 
-# --- Form Kehadiran (Dropdown + 3 Textarea) ---
+# --- Form Kehadiran (Vuetify 3 Dropdown + 3 Textarea + Checkbox) ---
 KEHADIRAN_SELECT_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//*[contains(normalize-space(text()), 'Kehadiran')]/following::select[1]"),
+    (By.XPATH, "//*[contains(translate(normalize-space(text()), 'KEHADIRAN', 'kehadiran'), 'kehadiran')]/following::select[1]"),
     (By.CSS_SELECTOR, "select[name*='kehadiran' i]"),
     (By.CSS_SELECTOR, "select[name*='status' i]"),
     (By.CSS_SELECTOR, "select"),
 )
 
 KEHADIRAN_CUSTOM_DROPDOWN_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//*[contains(normalize-space(text()), 'Kehadiran')]/following::button[@role='combobox' or @aria-haspopup='listbox' or self::button][1]"),
+    (By.XPATH, "//div[contains(@class, 'v-select')]//div[contains(@class, 'v-field')]"),
+    (By.XPATH, "//*[contains(normalize-space(.), 'Kehadiran')]/ancestor::*[contains(@class, 'v-input')][1]//div[contains(@class, 'v-field')]"),
     (By.XPATH, "//*[@role='combobox'][contains(., 'Pilih') or contains(., 'Kehadiran') or contains(., 'Hadir')]"),
-    (By.XPATH, "//button[contains(., 'Pilih Kehadiran') or contains(., 'Pilih Status')]"),
 )
 
 HADIR_OPTION_LOCATORS: tuple[Locator, ...] = (
+    (By.XPATH, "//div[contains(@class, 'v-overlay__content')]//div[contains(@class, 'v-list-item') and normalize-space(.)='Hadir']"),
     (By.XPATH, "//*[@role='option' and normalize-space(.)='Hadir']"),
     (By.XPATH, "//li[normalize-space(.)='Hadir']"),
     (By.XPATH, "//div[@role='listbox']//*[normalize-space(.)='Hadir']"),
-    (By.XPATH, "//button[normalize-space(.)='Hadir']"),
 )
 
 URAIAN_TEXTAREA_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//*[contains(normalize-space(text()), 'Uraian Aktivitas')]/following::textarea[1]"),
-    (By.CSS_SELECTOR, "textarea[name*='uraian' i]"),
-    (By.CSS_SELECTOR, "textarea[name*='aktivitas' i]"),
+    (By.CSS_SELECTOR, "textarea.v-field__input[placeholder*='uraian aktivitas' i]"),
+    (By.CSS_SELECTOR, "textarea[placeholder*='uraian' i]"),
+    (By.XPATH, "(//textarea[contains(@class, 'v-field__input')])[1]"),
     (By.XPATH, "(//textarea)[1]"),
 )
 
 PEMBELAJARAN_TEXTAREA_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//*[contains(normalize-space(text()), 'Pembelajaran yang Diperoleh')]/following::textarea[1]"),
-    (By.CSS_SELECTOR, "textarea[name*='pembelajaran' i]"),
+    (By.CSS_SELECTOR, "textarea.v-field__input[placeholder*='pembelajaran' i]"),
+    (By.CSS_SELECTOR, "textarea[placeholder*='pembelajaran' i]"),
+    (By.XPATH, "(//textarea[contains(@class, 'v-field__input')])[2]"),
     (By.XPATH, "(//textarea)[2]"),
 )
 
 KENDALA_TEXTAREA_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//*[contains(normalize-space(text()), 'Kendala yang Dialami')]/following::textarea[1]"),
-    (By.CSS_SELECTOR, "textarea[name*='kendala' i]"),
+    (By.CSS_SELECTOR, "textarea.v-field__input[placeholder*='kendala' i]"),
+    (By.CSS_SELECTOR, "textarea[placeholder*='kendala' i]"),
+    (By.XPATH, "(//textarea[contains(@class, 'v-field__input')])[3]"),
     (By.XPATH, "(//textarea)[3]"),
 )
 
+DECLARATION_CHECKBOX_LOCATORS: tuple[Locator, ...] = (
+    (By.XPATH, "//label[contains(., 'Saya menyatakan telah meninjau')]"),
+    (By.XPATH, "//*[contains(@class, 'v-checkbox')]//div[contains(@class, 'v-selection-control__wrapper')]"),
+    (By.CSS_SELECTOR, "input[type='checkbox'][aria-label*='Saya menyatakan telah meninjau']"),
+    (By.XPATH, "//*[contains(@class, 'v-checkbox')]//input[@type='checkbox']"),
+    (By.CSS_SELECTOR, "input[type='checkbox']"),
+)
+
 SUBMIT_FORM_LOCATORS: tuple[Locator, ...] = (
-    (By.XPATH, "//button[@type='submit' and (contains(., 'Simpan') or contains(., 'Kirim') or contains(., 'Submit'))]"),
-    (By.XPATH, "//button[contains(., 'Simpan Presensi') or contains(., 'Kirim Presensi') or contains(., 'Simpan') or contains(., 'Kirim')]"),
+    (By.XPATH, "//button[contains(., 'Simpan dan Kirim') and not(@disabled)]"),
+    (By.XPATH, "//button[contains(., 'Simpan dan Kirim')]"),
+    (By.XPATH, "//button[contains(., 'Simpan Presensi') or contains(., 'Kirim Presensi')]"),
     (By.CSS_SELECTOR, "form button[type='submit']"),
 )
 
