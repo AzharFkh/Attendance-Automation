@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     unzip \
     xvfb \
+    xauth \
     fonts-liberation \
     libnss3 \
     libxss1 \

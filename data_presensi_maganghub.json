@@ -48,5 +48,55 @@
     "uraian aktivitas": "Melakukan review kode (code review) bersama tim backend, menyelesaikan catatan revisi pada merge request, serta melakukan pengujian integrasi menyeluruh pada seluruh fitur yang dikerjakan selama dua pekan terakhir.",
     "pembelajaran yang diperoleh": "Memperoleh banyak masukan konstruktif terkait standar penulisan kode Golang, efisiensi query, dan struktur arsitektur microservice melalui proses code review bersama tim pengembang.",
     "kendala yang dialami": "Terdapat beberapa konflik penggabungan kode (merge conflict) akibat pembaruan paralel dari anggota tim lain pada repositori Git, namun berhasil diselesaikan dengan rapi setelah sinkronisasi branch."
+  },
+  "Jumat, 11 Desember 2026": {
+    "uraian aktivitas": "Melakukan sinkronisasi dan pemetaan kebutuhan endpoint backend berdasarkan hasil slicing tampilan frontend yang baru selesai dikerjakan, meliputi identifikasi service yang perlu disiapkan, struktur data JSON, serta parameter query untuk setiap halaman.",
+    "pembelajaran yang diperoleh": "Memahami cara menerjemahkan desain antarmuka hasil slicing frontend menjadi spesifikasi layanan backend dan kontrak API yang terstruktur agar proses integrasi berjalan searah.",
+    "kendala yang dialami": "Terdapat beberapa komponen UI pada halaman dashboard yang membutuhkan data gabungan dari lebih dari satu service, sehingga perlu diskusi singkat dengan tim frontend untuk menyepakati format payload yang efisien."
+  },
+  "Senin, 14 Desember 2026": {
+    "uraian aktivitas": "Mengembangkan endpoint REST API untuk service pertama sesuai order slicing frontend, yaitu layanan pengambilan data daftar utama beserta dukungan pagination, sorting, dan pencarian kata kunci agar langsung dapat dikonsumsi oleh komponen tabel di sisi klien.",
+    "pembelajaran yang diperoleh": "Memahami perancangan response pagination yang konsisten (meta total data, halaman aktif, dan batas item) sehingga komponen tabel pada frontend dapat merender navigasi halaman dengan akurat.",
+    "kendala yang dialami": "Sempat terjadi perbedaan penamaan field parameter query antara ekspektasi frontend dan konvensi backend, namun segera diselaraskan melalui pembaruan dokumentasi kontrak API."
+  },
+  "Selasa, 15 Desember 2026": {
+    "uraian aktivitas": "Melanjutkan pengembangan service backend untuk kebutuhan fitur filter lanjutan dan tampilan ringkasan (summary cards) sesuai hasil slicing frontend, termasuk optimasi query agregasi pada repository agar waktu respons tetap cepat.",
+    "pembelajaran yang diperoleh": "Mempelajari teknik penyusunan query agregasi yang efisien di sisi database serta cara memisahkan DTO response agar frontend hanya menerima data yang benar-benar dibutuhkan oleh tampilan.",
+    "kendala yang dialami": "Perlu menyesuaikan tipe data angka dan format tanggal pada JSON response agar sesuai dengan helper formatting yang sudah diterapkan oleh tim frontend."
+  },
+  "Rabu, 16 Desember 2026": {
+    "uraian aktivitas": "Mengimplementasikan endpoint untuk service detail data dan riwayat aktivitas berdasarkan order slicing halaman detail di frontend, lengkap dengan penanganan relasi antar-entitas serta validasi parameter ID pada request.",
+    "pembelajaran yang diperoleh": "Memahami pentingnya penanganan status error HTTP seperti 400 Bad Request dan 404 Not Found dengan pesan terstruktur agar frontend dapat menampilkan state kosong atau pesan error dengan tepat.",
+    "kendala yang dialami": "Ditemukan beberapa kasus data relasi yang bernilai null pada database pengembangan sehingga sempat menyebabkan error serialisasi, namun berhasil diatasi dengan menambahkan pengecekan pointer dan default value."
+  },
+  "Kamis, 17 Desember 2026": {
+    "uraian aktivitas": "Membangun endpoint transaksi pengiriman form (POST dan PUT) untuk mengakomodasi alur input multi-tahap hasil slicing frontend, meliputi validasi field wajib, aturan bisnis pada layer service, dan penyimpanan atomik ke database.",
+    "pembelajaran yang diperoleh": "Memahami penerapan database transaction agar seluruh proses penyimpanan data dari form frontend bersifat atomik sehingga tidak terjadi data setengah tersimpan saat terjadi kegagalan.",
+    "kendala yang dialami": "Terdapat beberapa aturan validasi kondisional antar-field yang baru terlihat saat mencoba skenario input dari UI frontend, sehingga perlu penambahan validasi tambahan di layer service."
+  },
+  "Jumat, 18 Desember 2026": {
+    "uraian aktivitas": "Mengembangkan layanan pendukung untuk pengambilan data referensi (master data dan opsi dropdown) yang dibutuhkan oleh berbagai komponen form hasil slicing frontend, serta menambahkan caching ringan agar tidak membebani database.",
+    "pembelajaran yang diperoleh": "Memahami cara mengelola endpoint master data yang sering diakses oleh frontend menggunakan strategi caching yang tepat agar performa rendering halaman tetap responsif.",
+    "kendala yang dialami": "Beberapa opsi dropdown di frontend membutuhkan struktur label dan value yang bersarang (nested), sehingga perlu penyesuaian mapper pada layer presenter/handler di backend."
+  },
+  "Senin, 21 Desember 2026": {
+    "uraian aktivitas": "Melakukan integrasi service autentikasi dan pengecekan hak akses (permission) untuk seluruh endpoint baru yang dipesan dari slicing frontend, memastikan setiap tombol dan aksi di UI terlindungi oleh otorisasi token yang valid.",
+    "pembelajaran yang diperoleh": "Memahami sinkronisasi mekanisme autentikasi antara backend dan frontend, termasuk penanganan token kedaluwarsa (401 Unauthorized) serta pembatasan akses fitur berdasarkan peran pengguna.",
+    "kendala yang dialami": "Sempat muncul kendala CORS preflight saat frontend lokal mencoba mengakses beberapa endpoint baru di lingkungan staging, namun berhasil diselesaikan dengan memperbarui konfigurasi header pada middleware."
+  },
+  "Selasa, 22 Desember 2026": {
+    "uraian aktivitas": "Mengimplementasikan endpoint pembaruan status dan aksi massal (bulk action) sesuai kebutuhan komponen interaktif pada hasil slicing frontend, disertai pencatatan log audit untuk setiap perubahan status yang dilakukan pengguna.",
+    "pembelajaran yang diperoleh": "Memahami perancangan endpoint bulk operation yang aman serta pentingnya audit trail untuk melacak perubahan status data yang dipicu dari interaksi antarmuka pengguna.",
+    "kendala yang dialami": "Perlu memastikan respons endpoint tetap memberikan rincian item mana yang berhasil dan gagal diproses apabila terdapat sebagian data yang tidak memenuhi syarat perubahan status."
+  },
+  "Rabu, 23 Desember 2026": {
+    "uraian aktivitas": "Melakukan penulisan unit test dan pengujian integrasi bersama tim frontend untuk seluruh service yang telah dikembangkan berdasarkan order slicing UI, memverifikasi kesesuaian payload request, response JSON, serta perilaku error state.",
+    "pembelajaran yang diperoleh": "Memahami pentingnya pengujian integrasi langsung dengan tampilan frontend untuk menemukan ketidaksesuaian kecil pada edge-case data yang tidak selalu terlihat dari pengujian API secara terpisah.",
+    "kendala yang dialami": "Terdapat beberapa penyesuaian minor pada struktur pesan validasi agar dapat langsung ditampilkan di bawah field form frontend, namun seluruh penyesuaian berhasil diselesaikan dengan cepat."
+  },
+  "Kamis, 24 Desember 2026": {
+    "uraian aktivitas": "Melakukan refactoring, pembersihan kode, dan pembaruan dokumentasi Swagger/OpenAPI untuk seluruh endpoint service hasil slicing frontend, serta menyelesaikan review merge request agar siap digabungkan ke branch pengembangan utama.",
+    "pembelajaran yang diperoleh": "Memperoleh pengalaman dalam menjaga konsistensi kode, keterbacaan arsitektur service, dan kelengkapan dokumentasi API setelah menyelesaikan rangkaian fitur lintas-service sesuai kebutuhan frontend.",
+    "kendala yang dialami": "Terdapat beberapa catatan kecil terkait penamaan variabel dan penanganan error pada saat code review, namun seluruh perbaikan sudah diterapkan dan lolos pengecekan pipeline."
   }
 }
