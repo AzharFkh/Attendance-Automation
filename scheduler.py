@@ -10,7 +10,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from src.config import AppConfig
 from src.data_loader import is_workday, today_in_timezone
-from src.logging_setup import setup_logging
+from src.logging_setup import cleanup_old_logs, setup_logging
 from src.presensi_bot import run_attendance
 
 logger = logging.getLogger(__name__)
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 def scheduled_job() -> None:
     config = AppConfig.from_env()
+    cleanup_old_logs(config.logs_dir, retention_days=config.log_retention_days)
     target_date = today_in_timezone(config.timezone)
     if not is_workday(target_date):
         logger.info("Hari libur akhir pekan (%s), job dilewati.", target_date.isoformat())
@@ -29,7 +30,7 @@ def scheduled_job() -> None:
 
 def main() -> None:
     config = AppConfig.from_env()
-    setup_logging(config.logs_dir, filename="scheduler.log")
+    setup_logging(config.logs_dir, filename="scheduler.log", retention_days=config.log_retention_days)
 
     tz = ZoneInfo(config.timezone)
     scheduler = BlockingScheduler(timezone=tz)

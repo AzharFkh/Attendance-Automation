@@ -59,7 +59,7 @@ def main() -> int:
         headless_override=False if args.headed else None,
         step_delay_override=args.step_delay,
     )
-    setup_logging(config.logs_dir)
+    setup_logging(config.logs_dir, retention_days=config.log_retention_days)
 
     if not args.run_now:
         logger.info("Gunakan '--run-now' untuk eksekusi sekali atau jalankan 'scheduler.py'.")

@@ -36,6 +36,7 @@ class AppConfig:
     timezone: str
     schedule_hour: int
     schedule_minute: int
+    log_retention_days: int
 
     @classmethod
     def from_env(
@@ -84,6 +85,7 @@ class AppConfig:
             timezone=os.getenv("TIMEZONE", "Asia/Jakarta").strip(),
             schedule_hour=int(os.getenv("SCHEDULE_HOUR", "15")),
             schedule_minute=int(os.getenv("SCHEDULE_MINUTE", "0")),
+            log_retention_days=int(os.getenv("LOG_RETENTION_DAYS", "4")),
         )
 
     def validate_credentials(self) -> None:
