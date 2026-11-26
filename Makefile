@@ -3,6 +3,7 @@ PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 DATE ?= 2026-11-27
 DELAY ?= 4
+RUN_DATE_FLAG := $(if $(filter command line,$(origin DATE)),--date $(DATE),)
 
 .PHONY: help setup test dev run scheduler docker-up docker-down docker-logs clean
 
@@ -20,8 +21,8 @@ test: ## Jalankan unit test
 dev: ## Uji coba mode development (browser tampil, pelan, tanpa submit). Contoh: make dev DATE=2026-11-27 DELAY=4
 	$(PYTHON) main.py --run-now --date $(DATE) --dry-run --headed --step-delay $(DELAY)
 
-run: ## Jalankan presensi hari ini sesuai konfigurasi .env
-	$(PYTHON) main.py --run-now
+run: ## Jalankan presensi hari ini (atau tanggal tertentu: make run DATE=2026-11-27)
+	$(PYTHON) main.py --run-now $(RUN_DATE_FLAG)
 
 scheduler: ## Jalankan service scheduler (Senin-Jumat 15:00 WIB)
 	$(PYTHON) scheduler.py

@@ -6,4 +6,5 @@ __pycache__/
 chrome_profile/
 logs/
 text.md
+setup.md
 .DS_Store
