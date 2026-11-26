@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 from datetime import date, datetime
 
@@ -76,6 +77,21 @@ def _perform_login(driver: WebDriver, config: AppConfig) -> None:
     )
 
 
+def _strip_calendar_legend(body_text: str) -> str:
+    """Remove the top calendar legend text so it never causes false-positive status matches."""
+    cleaned = re.sub(
+        r"Hadir disetujui\s+Izin disetujui\s+Tidak Hadir\s+Kehadiran Ditolak\s+Perlu Tindakan Anda",
+        "",
+        body_text,
+    )
+    cleaned = re.sub(
+        r"Menunggu Tindakan Mentor\s+Belum Diisi\s+Hari Libur",
+        "",
+        cleaned,
+    )
+    return cleaned
+
+
 def _detect_existing_status(driver: WebDriver) -> str | None:
     # Jika form input (textarea) tampil, berarti presensi hari ini BELUM diisi.
     if find_first_visible(driver, selectors.URAIAN_TEXTAREA_LOCATORS, timeout=1.0) is not None:
@@ -85,8 +101,13 @@ def _detect_existing_status(driver: WebDriver) -> str | None:
     if "Tambah laporan" in body_text:
         return None
 
+    detail_text = _strip_calendar_legend(body_text)
+    for holiday in selectors.HOLIDAY_TEXTS:
+        if holiday in detail_text:
+            return "Hari Libur"
+
     for status in selectors.ALREADY_FILLED_TEXTS:
-        if status in body_text:
+        if status in detail_text:
             return status
     return None
 
@@ -196,6 +217,14 @@ def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
         )
 
         existing_status = _detect_existing_status(driver)
+        if existing_status == "Hari Libur":
+            _step_pause(
+                f"Tanggal {entry.date_label} adalah Hari Libur di MagangHub. Presensi dilewati.",
+                config.step_delay_sec,
+            )
+            save_screenshot(driver, config.screenshots_dir, f"holiday_{entry.date_iso}_{timestamp}")
+            return True
+
         if existing_status:
             _step_pause(
                 f"Presensi {entry.date_label} sudah berstatus '{existing_status}'. Tidak perlu diisi ulang.",

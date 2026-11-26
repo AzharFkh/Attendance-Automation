@@ -5,6 +5,7 @@ from datetime import date
 from pathlib import Path
 
 from src.data_loader import format_indonesian_date, is_workday, load_attendance_for_date
+from src.presensi_bot import _strip_calendar_legend
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data_presensi_maganghub.json"
 
@@ -41,8 +42,21 @@ class TestDataLoader(unittest.TestCase):
             self.assertTrue(entry.pembelajaran_diperoleh)
             self.assertTrue(entry.kendala_dialami)
 
+    def test_holiday_flag_returns_none(self) -> None:
+        self.assertIsNone(load_attendance_for_date(DATA_FILE, date(2026, 12, 24)))
+
     def test_missing_date_returns_none(self) -> None:
         self.assertIsNone(load_attendance_for_date(DATA_FILE, date(2026, 11, 28)))
+
+    def test_strip_calendar_legend_removes_legend_labels(self) -> None:
+        sample = (
+            "Hadir disetujui Izin disetujui Tidak Hadir Kehadiran Ditolak Perlu Tindakan Anda\n"
+            "Menunggu Tindakan Mentor Belum Diisi Hari Libur\n"
+            "24 Desember 2026\nHari Libur"
+        )
+        cleaned = _strip_calendar_legend(sample)
+        self.assertNotIn("Belum Diisi", cleaned)
+        self.assertIn("24 Desember 2026\nHari Libur", cleaned)
 
 
 if __name__ == "__main__":

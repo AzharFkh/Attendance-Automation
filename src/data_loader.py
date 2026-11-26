@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+logger = logging.getLogger(__name__)
 
 INDONESIAN_DAYS = {
     0: "Senin",
@@ -84,6 +87,15 @@ def load_attendance_for_date(data_file: Path, target_date: date) -> AttendanceEn
 
     if not isinstance(entry, dict):
         raise ValueError(f"Data untuk '{date_label}' harus berupa object.")
+
+    if bool(entry.get("libur")) or bool(entry.get("skip")):
+        note = str(entry.get("keterangan", "")).strip()
+        logger.info(
+            "Tanggal '%s' ditandai libur/skip di JSON%s.",
+            date_label,
+            f" ({note})" if note else "",
+        )
+        return None
 
     missing = [field for field in REQUIRED_FIELDS if not str(entry.get(field, "")).strip()]
     if missing:

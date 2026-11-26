@@ -27,8 +27,15 @@ LOGIN_SUBMIT_LOCATORS: tuple[Locator, ...] = (
 )
 
 # --- Status Badges / Indicators ---
+HOLIDAY_TEXTS: tuple[str, ...] = (
+    "Hari Libur",
+    "Hari libur",
+    "Tidak perlu mengisi",
+)
+
 ALREADY_FILLED_TEXTS: tuple[str, ...] = (
     "Menunggu Persetujuan",
+    "Menunggu Tindakan Mentor",
     "Hadir disetujui",
     "Izin disetujui",
 )

@@ -95,8 +95,35 @@
     "kendala yang dialami": "Terdapat beberapa penyesuaian minor pada struktur pesan validasi agar dapat langsung ditampilkan di bawah field form frontend, namun seluruh penyesuaian berhasil diselesaikan dengan cepat."
   },
   "Kamis, 24 Desember 2026": {
-    "uraian aktivitas": "Melakukan refactoring, pembersihan kode, dan pembaruan dokumentasi Swagger/OpenAPI untuk seluruh endpoint service hasil slicing frontend, serta menyelesaikan review merge request agar siap digabungkan ke branch pengembangan utama.",
-    "pembelajaran yang diperoleh": "Memperoleh pengalaman dalam menjaga konsistensi kode, keterbacaan arsitektur service, dan kelengkapan dokumentasi API setelah menyelesaikan rangkaian fitur lintas-service sesuai kebutuhan frontend.",
-    "kendala yang dialami": "Terdapat beberapa catatan kecil terkait penamaan variabel dan penanganan error pada saat code review, namun seluruh perbaikan sudah diterapkan dan lolos pengecekan pipeline."
+    "libur": true,
+    "keterangan": "Hari Libur sesuai kalender MagangHub"
+  },
+  "Jumat, 25 Desember 2026": {
+    "libur": true,
+    "keterangan": "Hari Libur Nasional (Natal) sesuai kalender MagangHub"
+  },
+  "Senin, 28 Desember 2026": {
+    "uraian aktivitas": "Melakukan pengembangan endpoint baru untuk fitur ekspor laporan aktivitas dan rekapitulasi data ke format CSV/Excel sesuai kebutuhan tombol unduh pada halaman dashboard frontend, lengkap dengan filter rentang tanggal.",
+    "pembelajaran yang diperoleh": "Memahami cara menghasilkan file laporan di sisi backend secara streaming agar penggunaan memori server tetap rendah meskipun jumlah baris data yang diekspor cukup besar.",
+    "kendala yang dialami": "Sempat mengalami kendala encoding karakter khusus dan pemisah kolom saat file CSV dibuka di spreadsheet, namun berhasil diatasi dengan menambahkan BOM UTF-8 dan penyesuaian header response."
+  },
+  "Selasa, 29 Desember 2026": {
+    "uraian aktivitas": "Mengimplementasikan endpoint notifikasi dan riwayat pembaruan status untuk komponen lonceng notifikasi pada navbar frontend, termasuk fitur menandai notifikasi sebagai telah dibaca secara satuan maupun sekaligus.",
+    "pembelajaran yang diperoleh": "Memahami perancangan struktur tabel notifikasi dan query indexing berdasarkan user ID serta status baca agar badge jumlah notifikasi yang belum dibaca dapat dimuat dengan cepat.",
+    "kendala yang dialami": "Perlu menyinkronkan format timestamp dan zona waktu pada respons API agar tampilan waktu relatif (seperti beberapa menit lalu) di frontend tampil akurat."
+  },
+  "Rabu, 30 Desember 2026": {
+    "uraian aktivitas": "Melakukan optimasi performa query database dan penambahan database index pada beberapa endpoint yang memiliki beban pembacaan tinggi setelah diuji bersama komponen halaman utama frontend.",
+    "pembelajaran yang diperoleh": "Memahami penggunaan EXPLAIN ANALYZE untuk mengidentifikasi bottleneck query seperti sequential scan dan menentukan kolom komposit yang tepat untuk pembuatan index.",
+    "kendala yang dialami": "Beberapa query pencarian dengan wildcard di awal kata tidak langsung memanfaatkan B-tree index standar, sehingga perlu penyesuaian pola pencarian dan pengujian ulang waktu respons."
+  },
+  "Kamis, 31 Desember 2026": {
+    "uraian aktivitas": "Melakukan pengujian end-to-end akhir tahun bersama tim frontend untuk memastikan seluruh fitur hasil slicing yang telah dikembangkan selama bulan Desember berjalan stabil di lingkungan staging tanpa error regresi.",
+    "pembelajaran yang diperoleh": "Memperoleh pengalaman dalam melakukan verifikasi menyeluruh lintas-service sebelum rilis, termasuk pengecekan log error server, validasi payload, serta konsistensi data antar-halaman.",
+    "kendala yang dialami": "Ditemukan satu ketidaksesuaian minor pada pesan error validasi form di salah satu halaman, namun langsung berhasil diperbaiki dan diverifikasi ulang bersama tim frontend."
+  },
+  "Jumat, 1 Januari 2027": {
+    "libur": true,
+    "keterangan": "Hari Libur Nasional (Tahun Baru 2027) sesuai kalender MagangHub"
   }
 }
