@@ -35,22 +35,18 @@ Layanan automasi presensi harian untuk portal [Monev MagangHub](https://monev.ma
    make run DATE=2026-11-27 # Presensi tanggal tertentu
    ```
 
-## Deployment di Homelab
+## Deployment di Server (Pure Docker)
 
-### Opsi 1: Docker Compose (Direkomendasikan)
-Menggunakan `xvfb` agar Chrome berjalan non-headless di server tanpa GUI dan otomatis menyala di latar belakang:
+Aplikasi ini dideploy sepenuhnya menggunakan **Docker** (tidak dijalankan langsung di OS host server).
+
 ```bash
 make docker-up
 make docker-logs
 ```
 
-### Opsi 2: Systemd Service
-Sesuaikan path pada `deploy/presensi.service`, lalu aktifkan:
+Untuk uji eksekusi manual di dalam container:
 ```bash
-sudo cp deploy/presensi.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now presensi.service
-sudo systemctl status presensi.service
+docker exec maganghub-presensi python main.py --run-now --date 2026-11-27
 ```
 
 Lihat semua perintah `Makefile` yang tersedia dengan `make help`.

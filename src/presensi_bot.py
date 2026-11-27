@@ -112,6 +112,21 @@ def _detect_existing_status(driver: WebDriver) -> str | None:
     return None
 
 
+def _detect_submit_error(driver: WebDriver) -> str | None:
+    """Return error toast/alert text if submission was rejected by the server."""
+    alert_el = find_first_visible(driver, selectors.SUBMIT_ERROR_ALERT_LOCATORS, timeout=2.0)
+    if alert_el is not None:
+        text = (alert_el.text or "").strip()
+        if text:
+            return " ".join(text.split())
+
+    body_text = driver.execute_script("return document.body ? document.body.innerText : '';") or ""
+    for marker in ("hanya dapat dikirim", "Kode referensi", "Gagal mengirim", "tidak dapat dikirim"):
+        if marker.lower() in body_text.lower():
+            return marker
+    return None
+
+
 def _select_kehadiran_hadir(driver: WebDriver) -> None:
     select_el = find_first_visible(driver, selectors.KEHADIRAN_SELECT_LOCATORS, timeout=2)
     if select_el is not None:
@@ -256,10 +271,22 @@ def run_attendance(config: AppConfig, target_date: date | None = None) -> bool:
             _step_pause("Dialog konfirmasi diklik", config.step_delay_sec)
 
         human_delay(2.0, 3.0)
+        submit_error = _detect_submit_error(driver)
         final_status = _detect_existing_status(driver)
+
+        if submit_error or not final_status:
+            reason = submit_error or "Form masih tampil / status belum berubah setelah submit"
+            logger.error("FAIL TO SUBMIT presensi %s: %s", entry.date_label, reason)
+            save_screenshot(
+                driver,
+                config.screenshots_dir,
+                f"fail_to_submit_{entry.date_iso}_{timestamp}",
+            )
+            return False
+
         save_screenshot(driver, config.screenshots_dir, f"submitted_{entry.date_iso}_{timestamp}")
         _step_pause(
-            f"Presensi {entry.date_label} selesai dikirim. Status halaman: {final_status or 'Periksa screenshot'}",
+            f"Presensi {entry.date_label} berhasil dikirim. Status halaman: {final_status}",
             config.step_delay_sec,
         )
         return True

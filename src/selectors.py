@@ -100,3 +100,10 @@ SUBMIT_FORM_LOCATORS: tuple[Locator, ...] = (
 CONFIRM_MODAL_LOCATORS: tuple[Locator, ...] = (
     (By.XPATH, "//*[@role='dialog']//button[contains(., 'Ya') or contains(., 'Konfirmasi') or contains(., 'Kirim') or contains(., 'Simpan')]"),
 )
+
+SUBMIT_ERROR_ALERT_LOCATORS: tuple[Locator, ...] = (
+    (By.CSS_SELECTOR, ".v-snackbar__content"),
+    (By.CSS_SELECTOR, ".v-alert[role='alert'], [role='alert']"),
+    (By.XPATH, "//*[contains(@class, 'bg-error') or contains(@class, 'v-snackbar')]"),
+    (By.XPATH, "//*[contains(., 'hanya dapat dikirim') or contains(., 'Kode referensi')]"),
+)
