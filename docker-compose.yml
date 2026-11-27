@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - HEADLESS=false
+      - HEADLESS=${HEADLESS:-false}
     volumes:
       - ./data_presensi_maganghub.json:/app/data_presensi_maganghub.json:ro
       - ./chrome_profile:/app/chrome_profile
